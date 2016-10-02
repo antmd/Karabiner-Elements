@@ -1,0 +1,10 @@
+
+include(BundleUtilities)
+set(BU_CHMOD_BUNDLE_ITEMS TRUE) # If source library files are read-only, make them writable before fixup
+# BUNDLE is the full path the installed App Bundle
+# OTHER_LIBS is for plugins that aren't mentioned in otool -L output on the executable, but should be included in the app bundle for
+#            dynamic loading. Plugins should be copied into place using custom_commands before running fixup_bundle
+# OTHER_DIRS should be set to external framework directories so that fixup_bundle can find them. E.g. $ENV{HOME}/Development/Products/Debug
+#            fixup_bundle will automatically copy these frameworks into the app bundle
+#            
+fixup_bundle("@BUNDLE@" "@OTHER_LIBS@" "@OTHER_DIRS@")
