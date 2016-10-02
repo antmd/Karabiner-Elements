@@ -31,7 +31,7 @@ function(compile_xib Target ResourcesVar ResourcesBuildDir)
             get_filename_component(NibDir ${ResourcesBuildDir}/${xib} DIRECTORY)
 
             list(FIND CreatedDirs ${NibDir} Pos)
-            if (Pos EQUAL -1)
+            if (${Pos} EQUAL -1)
                 add_custom_command (
                     TARGET ${Target} PRE_BUILD
                     COMMAND mkdir -p "${NibDir}"
