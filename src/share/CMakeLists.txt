@@ -26,7 +26,6 @@ target_sources(
     ${CMAKE_CURRENT_SOURCE_DIR}/file_monitor.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/filesystem.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/grabber_client.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/hid_report.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/hid_system_client.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/human_interface_device.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/iokit_utility.hpp
@@ -42,7 +41,6 @@ target_sources(
     ${CMAKE_CURRENT_SOURCE_DIR}/system_preferences_monitor.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/types.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/virtual_hid_manager_client.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/virtual_hid_manager_user_client_method.hpp
     )
 
 set_source_files_properties(

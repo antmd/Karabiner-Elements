@@ -14,8 +14,8 @@ function(target_add_resources Target)
         set(ResourcesBaseDir ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
-    cmake_print_variables(_ART_RESOURCES_VAR _ART_BUILD_DIR _ART_BASE_DIR)
-    message("Resources = ${${_ART_RESOURCES_VAR}}")
+    #cmake_print_variables(_ART_RESOURCES_VAR _ART_BUILD_DIR _ART_BASE_DIR)
+    #message("Resources = ${${_ART_RESOURCES_VAR}}")
 
     # If generator isn't Xcode, we need to generate the app bundle 'manually' at build-time, to allow testing
     # Make sure the 'Resources' Directory is correctly created before we build
@@ -49,7 +49,7 @@ function(target_add_resources Target)
                 get_filename_component(XibName ${ResourceFilename} NAME_WE)
                 set(NibPath ${ResourceOutputDir}/${XibName}.nib)
 
-                cmake_print_variables(NibPath AbsResourceFilePath)
+                #cmake_print_variables(NibPath AbsResourceFilePath)
                 add_custom_command (TARGET ${Target} POST_BUILD 
                     COMMAND mkdir -p "${ResourceOutputDir}"
                     COMMAND ${XCRUN} ibtool 
