@@ -1,19 +1,22 @@
 function(preprocess_info_plist Target)
     set(options)
-    set(oneValueArgs PLIST)
+    set(oneValueArgs PLIST OUTPUT)
     set(multiValueArgs DEFINES)
     cmake_parse_arguments(_PP "${options}" "${oneValueArgs}"
                           "${multiValueArgs}" ${ARGN} )
 
+    #cmake_print_variables(_PP_OUTPUT _PP_PLIST _PP_DEFINES)
     if (NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
-        set(PreCmd "${CMAKE_CXX_COMPILER} -x c -w  -E ${_PP_DEFINES} '${_PP_PLIST}' | egrep -v '^\#'  > '${_PP_PLIST}.tmp'")
+        # | egrep -v '^\#'  > '${_PP_OUTPUT}'")
         separate_arguments(Cmd UNIX_COMMAND "${PreCmd}")
-        get_filename_component(Dir ${_PP_PLIST} DIRECTORY)
-        add_custom_command (
-            TARGET ${Target} PRE_BUILD
-            COMMAND mkdir -p "${Dir}"
-            COMMAND ${Cmd}
-            COMMAND sed -E "\'s|\\$$\\((.+)\\)|$$\{\\1}|\'" "${_PP_PLIST}.tmp" > "${_PP_PLIST}"
+        execute_process (
+            COMMAND ${CMAKE_CXX_COMPILER} -x c -w  -E ${_PP_DEFINES} ${_PP_PLIST}
+            OUTPUT_FILE ${_PP_OUTPUT}.tmp
+            )
+        execute_process (
+            COMMAND sed -E -e "s|\\$\\((.+)\)|$\\{\\1\\}|" -e "/^#/d" 
+            INPUT_FILE ${_PP_OUTPUT}.tmp
+            OUTPUT_FILE ${_PP_OUTPUT}
             )
     endif()
 endfunction()

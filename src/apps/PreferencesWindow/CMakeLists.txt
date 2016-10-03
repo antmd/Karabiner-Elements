@@ -10,14 +10,14 @@ include(InfoPlist)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(InfoPlist "${CMAKE_CURRENT_SOURCE_DIR}/PreferencesWindow/Info.plist.tmpl")
+set(InfoPlistTmpl "${CMAKE_CURRENT_SOURCE_DIR}/PreferencesWindow/Info.plist.tmpl")
 
 set(RESOURCE_FILES
     PreferencesWindow/Base.lproj/MainMenu.xib
     )
 
 set(INCLUDE_FILES
-    ../share/Relauncher.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../share/Relauncher.h
     PreferencesWindow/AppDelegate.h
     PreferencesWindow/LogFileTextViewController.h
     PreferencesWindow/PreferencesWindowController.h
@@ -25,7 +25,7 @@ set(INCLUDE_FILES
     )
 
 set(SOURCE_FILES
-    ../share/Relauncher.m
+    ${CMAKE_CURRENT_SOURCE_DIR}/../share/Relauncher.m
     PreferencesWindow/AppDelegate.m
     PreferencesWindow/LogFileTextViewController.m
     PreferencesWindow/PreferencesWindowController.m
@@ -55,6 +55,14 @@ target_link_libraries(
     libkrbn
     )
 
+set(InfoPlist ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+preprocess_info_plist(
+    ${PROJECT_NAME} 
+    PLIST ${InfoPlistTmpl}
+    OUTPUT ${InfoPlist}
+    DEFINES -DPKGVERSION=100
+    )
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION}, ${CopyrightString}"
     MACOSX_BUNDLE_INFO_PLIST ${InfoPlist}
@@ -82,10 +90,12 @@ set(AppBundleBuildDir ${BundleBuildPath}/${AppBundle})
 set(ContentsBuildDir ${AppBundleBuildDir}/Contents)
 set(ResourcesBuildDir ${ContentsBuildDir}/Resources)
 
-preprocess_info_plist(${PROJECT_NAME} 
-    PLIST ${ContentsBuildDir}/Info.plist
-    DEFINES -DPKGVERSION=100)
-compile_xib(${PROJECT_NAME} RESOURCE_FILES "${ResourcesBuildDir}")
+target_add_resources(
+    ${PROJECT_NAME} 
+    RESOURCES_VAR RESOURCE_FILES 
+    BUILD_DIR "${ResourcesBuildDir}"
+    BASE_DIR PreferencesWindow
+    )
 
 # INSTALL
 # -------

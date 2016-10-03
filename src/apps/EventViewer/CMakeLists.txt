@@ -10,7 +10,7 @@ include(InfoPlist)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(InfoPlist "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.tmpl")
+set(InfoPlistTmpl "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.tmpl")
 
 set(RESOURCE_FILES
     English.lproj/MainMenu.xib
@@ -54,6 +54,14 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../share
     )
 
+set(InfoPlist ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+preprocess_info_plist(
+    ${PROJECT_NAME} 
+    PLIST ${InfoPlistTmpl}
+    OUTPUT ${InfoPlist}
+    DEFINES -DPKGVERSION=100
+    )
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION}, ${CopyrightString}"
     MACOSX_BUNDLE_INFO_PLIST ${InfoPlist}
@@ -81,10 +89,11 @@ set(AppBundleBuildDir ${BundleBuildPath}/${AppBundle})
 set(ContentsBuildDir ${AppBundleBuildDir}/Contents)
 set(ResourcesBuildDir ${ContentsBuildDir}/Resources)
 
-preprocess_info_plist(${PROJECT_NAME} 
-    PLIST ${ContentsBuildDir}/Info.plist
-    DEFINES -DPKGVERSION=100)
-compile_xib(${PROJECT_NAME} RESOURCE_FILES "${ResourcesBuildDir}")
+target_add_resources(
+    ${PROJECT_NAME} 
+    RESOURCES_VAR RESOURCE_FILES 
+    BUILD_DIR "${ResourcesBuildDir}"
+    )
 
 # INSTALL EventViewer
 # -------
