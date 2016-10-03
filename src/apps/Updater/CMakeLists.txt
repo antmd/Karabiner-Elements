@@ -31,7 +31,7 @@ set(SOURCE_FILES
 # EXECUTABLE
 # ---------------
 add_executable(Updater MACOSX_BUNDLE ${SOURCE_FILES} ${INCLUDE_FILES})
-set(BundleName "Karabiner-Elements-Updater")
+set(BundleName "Karabiner-Elements")
 
 target_compile_options(
     Updater PUBLIC 
@@ -70,7 +70,7 @@ set_target_properties(Updater PROPERTIES
     MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION}, ${CopyrightString}"
     MACOSX_BUNDLE_INFO_PLIST ${InfoPlist}
     #MACOSX_BUNDLE_ICON_FILE "Logo"
-    MACOSX_BUNDLE_GUI_IDENTIFIER "${CompanyName}.${BundleName}"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "${CompanyName}.${BundleName}-Updater"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
     MACOSX_BUNDLE_BUNDLE_NAME "${BundleName}"
     MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
@@ -105,7 +105,7 @@ target_add_resources(
 # INSTALL
 # -------
 set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/Installed)
-set(InstallDir ${CMAKE_INSTALL_PREFIX})
+set(InstallDir ${CMAKE_INSTALL_PREFIX}/updater)
 install (
     TARGETS Updater
     LIBRARY DESTINATION ${InstallDir}
