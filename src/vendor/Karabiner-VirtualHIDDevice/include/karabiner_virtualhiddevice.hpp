@@ -1,13 +1,18 @@
 #pragma once
 
 // Do not use <cstring> for kext
+#include <stdint.h>
 #include <string.h>
+
+namespace pqrs {
+namespace karabiner_virtualhiddevice {
 
 class hid_report final {
 public:
   class __attribute__((packed)) pointing_input final {
   public:
-    pointing_input(void) : buttons{}, x(0), y(0), vertical_wheel(0), horizontal_wheel(0) {}
+    pointing_input(void)
+        : buttons{}, x(0), y(0), vertical_wheel(0), horizontal_wheel(0) {}
 
     uint8_t buttons[4]; // 32 bits for each button (32 buttons)
     uint8_t x;
@@ -26,3 +31,10 @@ public:
     // buttons[3] = (0x1 << 0) -> button 25
   };
 };
+
+enum class user_client_method {
+  pointing_input_report,
+  end_,
+};
+}
+}

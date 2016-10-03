@@ -1,6 +1,7 @@
 #include "DiagnosticMacros.hpp"
 
 BEGIN_IOKIT_INCLUDE;
+#include <IOKit/IOBufferMemoryDescriptor.h>
 #include <IOKit/IOLib.h>
 #include <IOKit/IOUserClient.h>
 END_IOKIT_INCLUDE;
@@ -11,19 +12,19 @@ END_IOKIT_INCLUDE;
 
 OSDefineMetaClassAndStructors(org_pqrs_driver_VirtualHIDManager_UserClient, IOUserClient);
 
-IOExternalMethodDispatch org_pqrs_driver_VirtualHIDManager_UserClient::methods_[static_cast<size_t>(virtual_hid_manager_user_client_method::end_)] = {
+IOExternalMethodDispatch org_pqrs_driver_VirtualHIDManager_UserClient::methods_[static_cast<size_t>(pqrs::karabiner_virtualhiddevice::user_client_method::end_)] = {
     {
         // pointing_input_report
         reinterpret_cast<IOExternalMethodAction>(&staticPointingInputReportCallback), // Method pointer.
         0,                                                                            // One scalar input value.
-        sizeof(hid_report::pointing_input),                                           // No struct input value.
+        sizeof(pqrs::karabiner_virtualhiddevice::hid_report::pointing_input),         // No struct input value.
         0,                                                                            // No scalar output value.
         0                                                                             // No struct output value.
     },
 };
 
 bool org_pqrs_driver_VirtualHIDManager_UserClient::initWithTask(task_t owningTask, void* securityToken, UInt32 type) {
-  IOLog("%s\n", __PRETTY_FUNCTION__);
+  IOLog("org_pqrs_driver_VirtualHIDManager_UserClient::initWithTask\n");
 
   if (clientHasPrivilege(owningTask, kIOClientPrivilegeAdministrator) != KERN_SUCCESS) {
     IOLog("%s Error: clientHasPrivilege failed.\n", __PRETTY_FUNCTION__);
@@ -41,17 +42,9 @@ bool org_pqrs_driver_VirtualHIDManager_UserClient::initWithTask(task_t owningTas
   return true;
 }
 
-IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::clientClose(void) {
-  IOLog("%s\n", __PRETTY_FUNCTION__);
-
-  // clear input events.
-  hid_report::pointing_input report;
-  pointingInputReportCallback(report);
-
-  return super::clientClose();
-}
-
 bool org_pqrs_driver_VirtualHIDManager_UserClient::start(IOService* provider) {
+  IOLog("org_pqrs_driver_VirtualHIDManager_UserClient::start\n");
+
   provider_ = OSDynamicCast(org_pqrs_driver_VirtualHIDManager, provider);
   if (!provider_) {
     IOLog("%s Error: provider_ == nullptr\n", __PRETTY_FUNCTION__);
@@ -62,12 +55,40 @@ bool org_pqrs_driver_VirtualHIDManager_UserClient::start(IOService* provider) {
     return false;
   }
 
+  provider_->attachClient();
+
   return true;
+}
+
+void org_pqrs_driver_VirtualHIDManager_UserClient::stop(IOService* provider) {
+  IOLog("org_pqrs_driver_VirtualHIDManager_UserClient::stop\n");
+
+  if (provider_) {
+    provider_->detachClient();
+  }
+
+  super::stop(provider);
+  provider_ = nullptr;
+}
+
+IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::clientClose(void) {
+  IOLog("org_pqrs_driver_VirtualHIDManager_UserClient::clientClose\n");
+
+  // clear input events.
+  pqrs::karabiner_virtualhiddevice::hid_report::pointing_input report;
+  pointingInputReportCallback(report);
+
+  if (!terminate()) {
+    IOLog("%s Error: terminate failed.\n", __PRETTY_FUNCTION__);
+  }
+
+  // DON'T call super::clientClose, which just returns kIOReturnUnsupported.
+  return kIOReturnSuccess;
 }
 
 IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::externalMethod(uint32_t selector, IOExternalMethodArguments* arguments,
                                                                       IOExternalMethodDispatch* dispatch, OSObject* target, void* reference) {
-  if (selector >= static_cast<uint32_t>(virtual_hid_manager_user_client_method::end_)) {
+  if (selector >= static_cast<uint32_t>(pqrs::karabiner_virtualhiddevice::user_client_method::end_)) {
     return kIOReturnUnsupported;
   }
 
@@ -89,24 +110,22 @@ IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::staticPointingInputReport
     return kIOReturnBadArgument;
   }
 
-  if (auto input = static_cast<const hid_report::pointing_input*>(arguments->structureInput)) {
+  if (auto input = static_cast<const pqrs::karabiner_virtualhiddevice::hid_report::pointing_input*>(arguments->structureInput)) {
     return target->pointingInputReportCallback(*input);
   }
 
   return kIOReturnBadArgument;
 }
 
-IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::pointingInputReportCallback(const hid_report::pointing_input& input) {
+IOReturn org_pqrs_driver_VirtualHIDManager_UserClient::pointingInputReportCallback(const pqrs::karabiner_virtualhiddevice::hid_report::pointing_input& input) {
   if (!provider_) {
     return kIOReturnError;
   }
 
-  if (auto pointing = provider_->getVirtualHIDPointing()) {
-    if (auto report = IOBufferMemoryDescriptor::withBytes(&input, sizeof(input), kIODirectionNone)) {
-      auto result = pointing->handleReport(report, kIOHIDReportTypeInput, kIOHIDOptionsTypeNone);
-      report->release();
-      return result;
-    }
+  if (auto report = IOBufferMemoryDescriptor::withBytes(&input, sizeof(input), kIODirectionNone)) {
+    auto result = provider_->handleHIDPointingReport(report);
+    report->release();
+    return result;
   }
 
   return kIOReturnError;
