@@ -42,9 +42,14 @@ add_executable(grabber ${SOURCE_FILES} ${INCLUDE_FILES})
 set_target_properties(
     grabber
     PROPERTIES
+    OUTPUT_NAME karabiner_grabber
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     )
+
+if (${CMAKE_GENERATOR} STREQUAL "Xcode")
+    set_target_properties(console_user_server PROPERTIES XCODE_ATTRIBUTE_PRODUCT_NAME "karabiner_grabber")
+endif()
 
 target_link_libraries(
     grabber

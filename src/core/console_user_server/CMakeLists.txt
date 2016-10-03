@@ -34,9 +34,14 @@ add_executable(console_user_server ${SOURCE_FILES} ${INCLUDE_FILES})
 set_target_properties(
     console_user_server
     PROPERTIES
+    OUTPUT_NAME karabiner_console_user_server
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     )
+
+if (${CMAKE_GENERATOR} STREQUAL "Xcode")
+    set_target_properties(console_user_server PROPERTIES XCODE_ATTRIBUTE_PRODUCT_NAME "karabiner_console_user_server")
+endif()
 
 target_link_libraries(
     console_user_server
@@ -61,6 +66,7 @@ target_compile_options(
     PRIVATE
     -Wno-deprecated-declarations
     )
+
 
 # -------
 # INSTALL

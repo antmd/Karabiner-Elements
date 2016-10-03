@@ -40,6 +40,7 @@ set(EventViewer_SOURCE_FILES
 # EXECUTABLE EventViewer
 # ---------------
 add_executable(EventViewer MACOSX_BUNDLE ${EventViewer_SOURCE_FILES} ${EventViewer_INCLUDE_FILES})
+set(BundleName "Karabiner-EventViewer")
 
 target_compile_options(
     EventViewer PUBLIC 
@@ -66,25 +67,27 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION}, ${CopyrightString}"
     MACOSX_BUNDLE_INFO_PLIST ${InfoPlist}
     #MACOSX_BUNDLE_ICON_FILE "Logo"
-    MACOSX_BUNDLE_GUI_IDENTIFIER "${CompanyName}.${PROJECT_NAME}"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "${CompanyName}.${BundleName}"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
-    MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}"
+    MACOSX_BUNDLE_BUNDLE_NAME "${BundleName}"
     MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
     MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
     MACOSX_BUNDLE_COPYRIGHT "${CopyrightString}"
+    OUTPUT_NAME "${BundleName}"
     )
 
 
 if (${CMAKE_GENERATOR} STREQUAL "Xcode")
     set_target_properties(${PROJECT_NAME} PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "Yes")
     set_target_properties(${PROJECT_NAME} PROPERTIES XCODE_ATTRIBUTE_WRAPPER_EXTENSION "app")
+    set_target_properties(${PROJECT_NAME} PROPERTIES XCODE_ATTRIBUTE_PRODUCT_NAME "${BundleName}")
     set(BundleBuildPath ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/\${CONFIGURATION})
 else()
     set(BundleBuildPath ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 # The app bundle directory in the build directory
-set(AppBundle ${PROJECT_NAME}.app)
+set(AppBundle ${BundleName}.app)
 set(AppBundleBuildDir ${BundleBuildPath}/${AppBundle})
 set(ContentsBuildDir ${AppBundleBuildDir}/Contents)
 set(ResourcesBuildDir ${ContentsBuildDir}/Resources)
@@ -113,9 +116,9 @@ set(BUNDLE "${InstallDir}/${AppBundle}")
 set(OTHER_DIRS ${FrameworkDirs})
 
 # Exported variables for Info.plist
-set(PRODUCT_NAME ${PROJECT_NAME})
+set(PRODUCT_NAME ${BundleName})
 set(MACOSX_DEPLOYMENT_TARGET 10.12)
-set(EXECUTABLE_NAME ${PROJECT_NAME})
+set(EXECUTABLE_NAME ${BundleName})
 
 configure_file(${FixupBundleTemplate} ${CMAKE_CURRENT_BINARY_DIR}/FixBundle.cmake)
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/FixBundle.cmake)

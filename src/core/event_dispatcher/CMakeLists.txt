@@ -33,9 +33,14 @@ add_executable(event_dispatcher ${SOURCE_FILES} ${INCLUDE_FILES})
 set_target_properties(
     event_dispatcher
     PROPERTIES
+    OUTPUT_NAME karabiner_event_dispatcher
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     )
+
+if (${CMAKE_GENERATOR} STREQUAL "Xcode")
+    set_target_properties(console_user_server PROPERTIES XCODE_ATTRIBUTE_PRODUCT_NAME "karabiner_event_dispatcher")
+endif()
 
 target_link_libraries(
     event_dispatcher
@@ -60,6 +65,7 @@ target_compile_options(
     PRIVATE
     -Wno-deprecated-declarations
     )
+
 
 # -------
 # INSTALL
