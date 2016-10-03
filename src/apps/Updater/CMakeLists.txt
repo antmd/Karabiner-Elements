@@ -5,6 +5,7 @@ project(Updater VERSION 0.1.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake")
 include(Variables)
 include(CompileXIB)
+include(AddFramework)
 include(CMakePrintHelpers)
 include(InfoPlist)
 
@@ -44,9 +45,16 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../share
     )
 
+target_add_framework(
+    ${PROJECT_NAME} PRIVATE
+    FRAMEWORK Sparkle
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Pods/Sparkle
+    )
+
 target_link_libraries(
     ${PROJECT_NAME} PRIVATE
     libkrbn
+    ${FRAMEWORK_Sparkle}
     )
 
 set(InfoPlist ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)

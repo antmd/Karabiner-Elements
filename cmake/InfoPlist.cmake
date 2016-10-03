@@ -10,7 +10,7 @@ function(preprocess_info_plist Target)
         # | egrep -v '^\#'  > '${_PP_OUTPUT}'")
         separate_arguments(Cmd UNIX_COMMAND "${PreCmd}")
         execute_process (
-            COMMAND ${CMAKE_CXX_COMPILER} -x c -w  -E ${_PP_DEFINES} ${_PP_PLIST}
+            COMMAND ${CMAKE_CXX_COMPILER} -x c -w -CC -E ${_PP_DEFINES} ${_PP_PLIST}
             OUTPUT_FILE ${_PP_OUTPUT}.tmp
             )
         execute_process (
